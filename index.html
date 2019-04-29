@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var username = "";
+    function LogIn() {
+        username = $("#username").val();
+        var socket = io();
+        socket.emit('login', username, function (data) {
+            if (data){
+                $('#chatPage').show();
+                $('#loginPage').hide();
+            }else{alert("Choose a different user name")}
+        });
+        $('#username').val('');
+        return false;
+    }
+    function LogOut() {
+        alert("logged out")
+        e.preventDefault(); // prevents page reloading
+        window.location.href = "/";
+    }
+    $(function () {
+        var socket = io();
+        $('#send').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            socket.emit('chat message', username+": "+$('#m').val());
+            $('#m').val('');
+            return false;
+        });
+        socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            playSound('message');
+
+        });
+        socket.on('user', function(msg){
+            $('#users').html(msg.toString());
+
+        });
+        socket.on('writing', function(user){
+            if (user === ""){
+                $('#writing').html("");
+            }else{
+            $('#writing').html(user.toString() + " is writing...");}
+        });
+        $('#logout').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            socket.emit('logout', username);
+            window.location.href = "/";
+            return false;
+        });
+        $('#m').on("focus", function(){
+            socket.emit('writing', username);
+
+        });
+        $('#m').on("focusout", function(){
+            socket.emit('writing', "");
+        });
+
+    });
+    function playSound(filename){
+        var x = document.getElementById("sound");
+        x.play();
+    }
+</script>
+<audio id="sound">
+    <source src="Media/Sounds/message.mp3" type="audio/mpeg">
+</audio>
+<div style="font-weight: bold">
+    v0 Chat App
+</div>
+<div id="loginPage">
+    username:
+    <input type="text" id="username">
+    <input type="button" value="submit" onclick="LogIn()">
+</div>
+<div id="chatPage" style="display: none">
+    users:<form id="logout" action=""><button onclick="LogOut()">Logout</button></form><p id="users"></p>
+    <br>
+
+    messages:
+    <ul id="messages"></ul>
+    <form id="send"action="">
+        <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    <p id="writing"></p>
+</div>
+</body>
+</html>
