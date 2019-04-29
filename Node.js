@@ -7,6 +7,7 @@ var io = require('socket.io')(http);
 
 
 var users = [];
+var messages = [];
 app.use('/Media/Sounds', express.static(__dirname + '/Media/Sounds'));
 app.get("/", function(request, response) {
     console.log("opening /");
@@ -29,6 +30,7 @@ io.on('connection', function(socket){
             console.log("login success");
             users.push(username);
             io.emit('user', users);
+            io.emit('fill chat', messages);
             var user = username;
             callback(true);
 
@@ -50,6 +52,7 @@ io.on('connection', function(socket){
     socket.on('chat message', function(msg){
         console.log('message: ' + msg);
         io.emit('chat message', msg);
+        messages.push(msg);
 
     });
     socket.on('writing', function(user){

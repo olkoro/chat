@@ -39,6 +39,12 @@
             playSound('message');
 
         });
+        socket.on('fill chat', function(msgs){
+            for(var i in msgs){
+                $('#messages').append($('<li>').text(msg[i]));
+            }
+
+        });
         socket.on('user', function(msg){
             $('#users').html(msg.toString());
 
