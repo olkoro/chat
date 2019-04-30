@@ -40,8 +40,10 @@
 
         });
         socket.on('fill chat', function(msgs){
-            for(var i in msgs){
-                $('#messages').append($('<li>').text(msg[i]));
+            if ($('#messages').innerHTML.length < 3) {
+                for (i = 0; i < msgs.length; i++){
+                    $('#messages').append($('<li>').text(msgs[i]));
+                }
             }
 
         });
@@ -91,7 +93,8 @@
     <br>
 
     messages:
-    <ul id="messages"></ul>
+    
+    <ul id="messages" style="overflow: scroll;height: 30em; width: 50%; border: dotted;"></ul>
     <form id="send"action="">
         <input id="m" autocomplete="off" /><button>Send</button>
     </form>
